@@ -8,7 +8,7 @@ resource "aws_launch_configuration" "this" {
   name_prefix     = "${var.lc_name}"
   image_id        = "${var.image_id}"
   instance_type   = "${var.instance_type}"
-  security_groups = "${var.security_groups}"
+  security_groups = ["${var.security_groups}"]
 
   user_data                   = "${var.user_data}"
   iam_instance_profile        = "${var.iam_role}"
