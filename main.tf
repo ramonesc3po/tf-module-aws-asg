@@ -8,7 +8,7 @@ resource "aws_launch_configuration" "this" {
   name_prefix     = "${var.lc_name}"
   image_id        = "${var.image_id}"
   instance_type   = "${var.instance_type}"
-  security_groups = "${var.security_groups}"
+  security_groups = ["${var.security_groups}"]
 
   user_data                   = "${var.user_data}"
   iam_instance_profile        = "${var.iam_role}"
@@ -40,9 +40,9 @@ resource "aws_autoscaling_group" "this_whitout_lifecycle_hook" {
 
   launch_configuration = "${var.lc_create ? element(concat(aws_launch_configuration.this.*.name, list("")), 0) : var.lc_without_module_name}"
 
-  vpc_zone_identifier = "${var.vpc_zone_identifier}"
+  vpc_zone_identifier = ["${var.vpc_zone_identifier}"]
 
-  target_group_arns = "${var.target_group_arns}"
+  target_group_arns = ["${var.target_group_arns}"]
 
   termination_policies = "${var.termination_policies}"
   force_delete         = "${var.force_delete}"
