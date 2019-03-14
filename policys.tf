@@ -6,7 +6,7 @@
 
 variable "scale_up_scaling_adjustment" {
   description = "(Optional) The number of instances by which to scale. adjustment_type determines the interpretation of this number (e.g., as an absolute number or as a percentage of the existing Auto Scaling group size). A positive increment adds to the current capacity and a negative value removes from the current capacity."
-  default     = 1
+  default     = 3
 }
 
 variable "scale_up_adjustment_type" {
@@ -21,7 +21,7 @@ variable "scale_up_policy_type" {
 
 variable "scale_up_cooldown" {
   description = "(Optional) The amount of time, in seconds, after a scaling activity completes and before the next scaling activity can start."
-  default     = "300"
+  default     = "120"
 }
 
 variable "scale_down_scaling_adjustment" {
@@ -41,7 +41,7 @@ variable "scale_down_policy_type" {
 
 variable "scale_down_cooldown" {
   description = "(Optional) The amount of time, in seconds, after a scaling activity completes and before the next scaling activity can start."
-  default     = "300"
+  default     = "120"
 }
 
 variable "enabled_autoscaling_policy_cpu" {
@@ -51,24 +51,24 @@ variable "enabled_autoscaling_policy_cpu" {
 # Cloudwatch variables
 
 variable "scale_up_high_cpu_threshold" {
-  default = "90"
+  default = "20"
 }
 
 variable "scale_up_high_cpu_period" {
-  default = "120"
+  default = "30"
 }
 
 variable "scale_up_high_cpu_evaluation_periods" {
-  default = "2"
+  default = "1"
 }
 
 variable "scale_up_high_cpu_statistic" {
   description = "(Optional) The statistic to apply to the alarm's associated metric. Either of the following is supported: SampleCount, Average, Sum, Minimum, Maximum"
-  default     = "Avarege"
+  default     = "Average"
 }
 
 variable "scale_down_low_cpu_threshold" {
-  default = "15"
+  default = "5"
 }
 
 variable "scale_down_low_cpu_period" {
@@ -76,12 +76,12 @@ variable "scale_down_low_cpu_period" {
 }
 
 variable "scale_down_low_cpu_evaluation_periods" {
-  default = "2"
+  default = "3"
 }
 
 variable "scale_down_low_cpu_statistic" {
   description = "(Optional) The statistic to apply to the alarm's associated metric. Either of the following is supported: SampleCount, Average, Sum, Minimum, Maximum"
-  default     = "Avarege"
+  default     = "Average"
 }
 
 locals {
@@ -91,7 +91,7 @@ locals {
 }
 
 resource "aws_autoscaling_policy" "scale_up" {
-  count                  = "${local.enabled_autoscaling_policy_cpu}"
+  count                  = "${local.enabled_autoscaling_policy_cpu ? 1 : 0}"
   name                   = "${var.asg_name}-${var.asg_tier}-scale-up"
   autoscaling_group_name = "${local.asg_name_this}"
   scaling_adjustment     = "${var.scale_up_scaling_adjustment}"
@@ -101,7 +101,7 @@ resource "aws_autoscaling_policy" "scale_up" {
 }
 
 resource "aws_autoscaling_policy" "scale_down" {
-  count                  = "${local.enabled_autoscaling_policy_cpu}"
+  count                  = "${local.enabled_autoscaling_policy_cpu ? 1 : 0}"
   name                   = "${var.asg_name}-${var.asg_tier}-scale-down"
   autoscaling_group_name = "${local.asg_name_this}"
   scaling_adjustment     = "${var.scale_down_scaling_adjustment}"
@@ -111,7 +111,7 @@ resource "aws_autoscaling_policy" "scale_down" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "scale_up_high_cpu" {
-  count               = "${local.enabled_autoscaling_policy_cpu}"
+  count               = "${local.enabled_autoscaling_policy_cpu ? 1 : 0}"
   alarm_name          = "${var.asg_name}-${var.asg_tier}-high-cpu-scale-up"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "${var.scale_up_high_cpu_evaluation_periods}"
@@ -126,11 +126,11 @@ resource "aws_cloudwatch_metric_alarm" "scale_up_high_cpu" {
   }
 
   alarm_description = "Scale up if the cpu used is above for ${var.scale_up_high_cpu_threshold} for ${var.scale_up_high_cpu_period} seconds"
-  alarm_actions     = ["${aws_autoscaling_group.this_whitout_lifecycle_hook.arn}"]
+  alarm_actions     = ["${aws_autoscaling_policy.scale_up.arn}"]
 }
 
 resource "aws_cloudwatch_metric_alarm" "scale_down_low_cpu" {
-  count               = "${local.enabled_autoscaling_policy_cpu}"
+  count               = "${local.enabled_autoscaling_policy_cpu ? 1 : 0}"
   alarm_name          = "${var.asg_name}-${var.asg_tier}-low-cpu-scale-down"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "${var.scale_down_low_cpu_evaluation_periods}"
@@ -145,5 +145,5 @@ resource "aws_cloudwatch_metric_alarm" "scale_down_low_cpu" {
   }
 
   alarm_description = "Scale down if the cpu used is below for ${var.scale_down_low_cpu_threshold} for ${var.scale_down_low_cpu_period} seconds"
-  alarm_actions     = ["${aws_autoscaling_group.this_whitout_lifecycle_hook.arn}"]
+  alarm_actions     = ["${aws_autoscaling_policy.scale_down.arn}"]
 }
