@@ -1,5 +1,5 @@
 terraform {
-  required_version = "<= 0.11.11"
+  required_version = "<= 0.11.13"
 }
 
 resource "aws_launch_configuration" "this" {
