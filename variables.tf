@@ -122,7 +122,6 @@ variable "desired_capacity" {
 variable "vpc_zone_identifier" {
   description = "A list of subnet IDs to launch resources in"
   type        = "list"
-  default     = []
 }
 
 variable "target_group_arns" {

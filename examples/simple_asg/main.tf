@@ -1,4 +1,6 @@
 data "aws_ami" "this" {
+  most_recent = true
+
   filter {
     name   = "name"
     values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
@@ -30,12 +32,18 @@ resource "aws_security_group" "this" {
   }
 }
 
+resource "aws_subnet" "this" {
+  cidr_block = "10.10.10.0/27"
+  vpc_id = "${aws_vpc.this.id}"
+}
+
 module "simple_asg" {
   source = "../../"
 
   lc_name = "zigzaga-${var.tier}"
   instance_type = "t2.micro"
   image_id = "${data.aws_ami.this.id}"
+  security_groups = ["${aws_security_group.this.id}"]
 
   asg_name         = "webapp"
   asg_organization = "zigzaga"
@@ -45,5 +53,15 @@ module "simple_asg" {
   max_size         = "0"
   desired_capacity = "0"
 
-  security_groups = ["${aws_security_group.this.id}"]
+  termination_policies = "${local.termination_policies}"
+
+  vpc_zone_identifier = ["${aws_subnet.this.id}"]
+
+  tags = [
+    {
+      key = "Application"
+      propagate_at_launch = "true"
+      value = "webapp"
+    }
+  ]
 }
