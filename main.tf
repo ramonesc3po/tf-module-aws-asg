@@ -52,5 +52,6 @@ resource "aws_autoscaling_group" "this_whitout_lifecycle_hook" {
 
   lifecycle {
     create_before_destroy = true
+    ignore_changes = ["min_size","desired_capacity"]
   }
 }
