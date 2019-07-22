@@ -57,7 +57,6 @@ variable "ebs_optimized" {
 
 variable "root_block_device" {
   description = "Customize details about the root block device of the instance"
-  type        = list(string)
   default     = []
 }
 
