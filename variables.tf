@@ -31,7 +31,7 @@ variable "key_name" {
 
 variable "security_groups" {
   description = "Define a list of security groups that will be associate"
-  type        = list(string)
+  type        = "list"
   default     = []
 }
 
@@ -62,13 +62,13 @@ variable "root_block_device" {
 
 variable "ebs_block_device" {
   description = "Additional EBS block devices to attach to the instance"
-  type        = list(string)
+  type = "list"
   default     = []
 }
 
 variable "ephemeral_block_device" {
   description = "Customize Ephemeral volumes on the instance"
-  type        = list(string)
+  type = "list"
   default     = []
 }
 
@@ -120,18 +120,18 @@ variable "desired_capacity" {
 
 variable "vpc_zone_identifier" {
   description = "A list of subnet IDs to launch resources in"
-  type        = list(string)
+  type = "list"
 }
 
 variable "target_group_arns" {
   description = "A list of aws_alb_target_group ARNs, for use with Application Load Balancing"
-  type        = list(string)
+  type = "list"
   default     = []
 }
 
 variable "termination_policies" {
   description = "A list of policies to decide how the instances in the auto scale group should be terminated. The allowed values are OldestInstance, NewestInstance, OldestLaunchConfiguration, ClosestToNextInstanceHour, Default"
-  type        = list(string)
+  type = "list"
   default     = ["Default"]
 }
 
@@ -157,19 +157,19 @@ variable "default_cooldown" {
 
 variable "suspended_processes" {
   description = "A list of processes to suspend for the AutoScaling Group. The allowed values are Launch, Terminate, HealthCheck, ReplaceUnhealthy, AZRebalance, AlarmNotification, ScheduledActions, AddToLoadBalancer. Note that if you suspend either the Launch or Terminate process types, it can prevent your autoscaling group from functioning properly."
-  type        = list(string)
+  type = "list"
   default     = []
 }
 
 variable "tags" {
   description = "Add extra tags"
-  type        = list(string)
+  type = "list"
   default     = []
 }
 
 variable "enabled_metrics" {
   description = "A list of metrics to collect. The allowed values are GroupMinSize, GroupMaxSize, GroupDesiredCapacity, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupTerminatingInstances, GroupTotalInstances"
-  type        = list(string)
+  type = "list"
 
   default = [
     "GroupMinSize",
