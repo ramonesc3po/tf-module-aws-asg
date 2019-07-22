@@ -1,19 +1,20 @@
 locals {
   requireds_tags_intances_asg = [
     {
-      key = "Terraform"
+      key                 = "Terraform"
       propagate_at_launch = "true"
-      value = "true"
+      value               = "true"
     },
     {
-      key = "Organization"
+      key                 = "Organization"
       propagate_at_launch = "true"
-      value = "${var.asg_organization}"
+      value               = var.asg_organization
     },
     {
-      key = "Tier"
+      key                 = "Tier"
       propagate_at_launch = "true"
-      value = "${var.asg_tier}"
-    }
+      value               = var.asg_tier
+    },
   ]
 }
+

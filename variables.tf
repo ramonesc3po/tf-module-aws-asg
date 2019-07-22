@@ -12,7 +12,7 @@ variable "lc_name" {
 
 variable "image_id" {
   description = "ID of the defined image that you would like to use in the activation setting"
-  type        = "string"
+  type        = string
 }
 
 variable "instance_type" {
@@ -31,7 +31,7 @@ variable "key_name" {
 
 variable "security_groups" {
   description = "Define a list of security groups that will be associate"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
@@ -57,19 +57,19 @@ variable "ebs_optimized" {
 
 variable "root_block_device" {
   description = "Customize details about the root block device of the instance"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
 variable "ebs_block_device" {
   description = "Additional EBS block devices to attach to the instance"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
 variable "ephemeral_block_device" {
   description = "Customize Ephemeral volumes on the instance"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
@@ -121,18 +121,18 @@ variable "desired_capacity" {
 
 variable "vpc_zone_identifier" {
   description = "A list of subnet IDs to launch resources in"
-  type        = "list"
+  type        = list(string)
 }
 
 variable "target_group_arns" {
   description = "A list of aws_alb_target_group ARNs, for use with Application Load Balancing"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
 variable "termination_policies" {
   description = "A list of policies to decide how the instances in the auto scale group should be terminated. The allowed values are OldestInstance, NewestInstance, OldestLaunchConfiguration, ClosestToNextInstanceHour, Default"
-  type        = "list"
+  type        = list(string)
   default     = ["Default"]
 }
 
@@ -153,24 +153,24 @@ variable "health_check_grace_period" {
 
 variable "default_cooldown" {
   description = "The amount of time, in seconds, after a scaling activity completes before another scaling activity can start"
-  default = "300"
+  default     = "300"
 }
 
 variable "suspended_processes" {
   description = "A list of processes to suspend for the AutoScaling Group. The allowed values are Launch, Terminate, HealthCheck, ReplaceUnhealthy, AZRebalance, AlarmNotification, ScheduledActions, AddToLoadBalancer. Note that if you suspend either the Launch or Terminate process types, it can prevent your autoscaling group from functioning properly."
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
 variable "tags" {
   description = "Add extra tags"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
 variable "enabled_metrics" {
   description = "A list of metrics to collect. The allowed values are GroupMinSize, GroupMaxSize, GroupDesiredCapacity, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupTerminatingInstances, GroupTotalInstances"
-  type        = "list"
+  type        = list(string)
 
   default = [
     "GroupMinSize",
@@ -183,3 +183,4 @@ variable "enabled_metrics" {
     "GroupTotalInstances",
   ]
 }
+

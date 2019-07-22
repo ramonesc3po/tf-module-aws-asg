@@ -85,65 +85,66 @@ variable "scale_down_low_cpu_statistic" {
 }
 
 locals {
-  enabled_autoscaling_policy_cpu = "${var.enabled_autoscaling_policy_cpu == true }"
+  enabled_autoscaling_policy_cpu = var.enabled_autoscaling_policy_cpu == true
 
-  asg_name_this = "${aws_autoscaling_group.this_whitout_lifecycle_hook.name}"
+  asg_name_this = aws_autoscaling_group.this_whitout_lifecycle_hook[0].name
 }
 
 resource "aws_autoscaling_policy" "scale_up" {
-  count                  = "${local.enabled_autoscaling_policy_cpu ? 1 : 0}"
+  count                  = local.enabled_autoscaling_policy_cpu ? 1 : 0
   name                   = "${var.asg_name}-${var.asg_tier}-scale-up"
-  autoscaling_group_name = "${local.asg_name_this}"
-  scaling_adjustment     = "${var.scale_up_scaling_adjustment}"
-  adjustment_type        = "${var.scale_up_adjustment_type}"
-  policy_type            = "${var.scale_up_policy_type}"
-  cooldown               = "${var.scale_up_cooldown}"
+  autoscaling_group_name = local.asg_name_this
+  scaling_adjustment     = var.scale_up_scaling_adjustment
+  adjustment_type        = var.scale_up_adjustment_type
+  policy_type            = var.scale_up_policy_type
+  cooldown               = var.scale_up_cooldown
 }
 
 resource "aws_autoscaling_policy" "scale_down" {
-  count                  = "${local.enabled_autoscaling_policy_cpu ? 1 : 0}"
+  count                  = local.enabled_autoscaling_policy_cpu ? 1 : 0
   name                   = "${var.asg_name}-${var.asg_tier}-scale-down"
-  autoscaling_group_name = "${local.asg_name_this}"
-  scaling_adjustment     = "${var.scale_down_scaling_adjustment}"
-  adjustment_type        = "${var.scale_down_adjustment_type}"
-  policy_type            = "${var.scale_down_policy_type}"
-  cooldown               = "${var.scale_down_cooldown}"
+  autoscaling_group_name = local.asg_name_this
+  scaling_adjustment     = var.scale_down_scaling_adjustment
+  adjustment_type        = var.scale_down_adjustment_type
+  policy_type            = var.scale_down_policy_type
+  cooldown               = var.scale_down_cooldown
 }
 
 resource "aws_cloudwatch_metric_alarm" "scale_up_high_cpu" {
-  count               = "${local.enabled_autoscaling_policy_cpu ? 1 : 0}"
+  count               = local.enabled_autoscaling_policy_cpu ? 1 : 0
   alarm_name          = "${var.asg_name}-${var.asg_tier}-high-cpu-scale-up"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "${var.scale_up_high_cpu_evaluation_periods}"
+  evaluation_periods  = var.scale_up_high_cpu_evaluation_periods
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = "${var.scale_up_high_cpu_period}"
-  statistic           = "${var.scale_up_high_cpu_statistic}"
-  threshold           = "${var.scale_up_high_cpu_threshold}"
+  period              = var.scale_up_high_cpu_period
+  statistic           = var.scale_up_high_cpu_statistic
+  threshold           = var.scale_up_high_cpu_threshold
 
-  dimensions {
-    AutoScalingGroupName = "${local.asg_name_this}"
+  dimensions = {
+    AutoScalingGroupName = local.asg_name_this
   }
 
   alarm_description = "Scale up if the cpu used is above for ${var.scale_up_high_cpu_threshold} for ${var.scale_up_high_cpu_period} seconds"
-  alarm_actions     = ["${aws_autoscaling_policy.scale_up.arn}"]
+  alarm_actions     = [aws_autoscaling_policy.scale_up[0].arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "scale_down_low_cpu" {
-  count               = "${local.enabled_autoscaling_policy_cpu ? 1 : 0}"
+  count               = local.enabled_autoscaling_policy_cpu ? 1 : 0
   alarm_name          = "${var.asg_name}-${var.asg_tier}-low-cpu-scale-down"
   comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "${var.scale_down_low_cpu_evaluation_periods}"
+  evaluation_periods  = var.scale_down_low_cpu_evaluation_periods
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = "${var.scale_down_low_cpu_period}"
-  statistic           = "${var.scale_down_low_cpu_statistic}"
-  threshold           = "${var.scale_down_low_cpu_threshold}"
+  period              = var.scale_down_low_cpu_period
+  statistic           = var.scale_down_low_cpu_statistic
+  threshold           = var.scale_down_low_cpu_threshold
 
-  dimensions {
-    AutoScalingGroupName = "${local.asg_name_this}"
+  dimensions = {
+    AutoScalingGroupName = local.asg_name_this
   }
 
   alarm_description = "Scale down if the cpu used is below for ${var.scale_down_low_cpu_threshold} for ${var.scale_down_low_cpu_period} seconds"
-  alarm_actions     = ["${aws_autoscaling_policy.scale_down.arn}"]
+  alarm_actions     = [aws_autoscaling_policy.scale_down[0].arn]
 }
+
