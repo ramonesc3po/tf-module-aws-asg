@@ -1,5 +1,5 @@
 resource "aws_launch_configuration" "this" {
-  count = var.lc_create
+  count = var.lc_create == true ? 1 : 0
 
   name_prefix     = var.lc_name
   image_id        = var.image_id
@@ -49,7 +49,7 @@ resource "aws_launch_configuration" "this" {
 }
 
 resource "aws_autoscaling_group" "this_whitout_lifecycle_hook" {
-  count = var.asg_create
+  count = var.asg_create == true ? 1 : 0
 
   name             = "${var.asg_name}-asg-${var.asg_tier}"
   max_size         = var.max_size
@@ -70,7 +70,7 @@ resource "aws_autoscaling_group" "this_whitout_lifecycle_hook" {
   force_delete         = var.force_delete
   enabled_metrics      = var.enabled_metrics
 
-  tags = [concat(
+  tags = concat(
     var.tags,
     local.requireds_tags_intances_asg,
     [
@@ -80,7 +80,7 @@ resource "aws_autoscaling_group" "this_whitout_lifecycle_hook" {
         value               = "${var.asg_name}-${var.asg_tier}"
       },
     ],
-  )]
+  )
 
   lifecycle {
     create_before_destroy = true
